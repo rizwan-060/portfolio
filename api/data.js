@@ -14,11 +14,13 @@ export default async function handler(req, res) {
     const [profile] = await connection.execute('SELECT * FROM profile LIMIT 1');
     const [skills] = await connection.execute('SELECT * FROM skills');
     const [projects] = await connection.execute('SELECT * FROM projects');
+    const [services] = await connection.execute('SELECT * FROM services'); 
 
     res.status(200).json({
       profile: profile[0],
       skills: skills,
-      projects: projects
+      projects: projects,
+      services: services
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
