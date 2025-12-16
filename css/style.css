@@ -1,3 +1,7 @@
+/* --- IMPORTS --- */
+/* Added 'Dancing Script' for the signature look */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@300;500;700&family=Dancing+Script:wght@700&display=swap');
+
 /* --- VARIABLES --- */
 :root {
     --bg-dark: #0b0b0f;
@@ -9,6 +13,7 @@
     --text-secondary: #a0a0a0;
     --font-heading: 'Space Grotesk', sans-serif;
     --font-body: 'Outfit', sans-serif;
+    --font-signature: 'Dancing Script', cursive; /* New Variable */
 }
 
 body {
@@ -34,6 +39,15 @@ body {
 h1, h2, h3, h4, .logo-text { font-family: var(--font-heading); }
 .text-accent { color: var(--accent); }
 .text-light-gray { color: var(--text-secondary); }
+
+/* NEW: Cursive Name Style */
+#p-name {
+    font-family: var(--font-signature);
+    letter-spacing: 2px;
+    font-weight: 400; /* Cursive is naturally bold */
+    transform: rotate(-2deg); /* Slight tilt for handwritten feel */
+    display: inline-block;
+}
 
 .gradient-text {
     background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
@@ -105,25 +119,26 @@ h1, h2, h3, h4, .logo-text { font-family: var(--font-heading); }
 }
 .btn-outline-custom:hover { background: var(--accent); color: #000; }
 
-/* --- CARDS --- */
-.skill-card {
-    background: rgba(255,255,255,0.03);
+/* --- CARDS (Unified Design) --- */
+/* This matches Skills, Projects, and Services now */
+.skill-card, .project-card, .service-card {
+    background: rgba(255,255,255,0.03) !important; /* Force override glass-panel */
     border: 1px solid var(--glass-border);
     padding: 30px;
     border-radius: 12px;
-    transition: transform 0.3s ease;
-}
-.skill-card:hover { transform: translateY(-10px); border-color: var(--accent); }
-
-.project-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--glass-border);
-    padding: 2rem;
-    border-radius: 12px;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    backdrop-filter: none; /* Remove heavy blur */
+    box-shadow: none;
     height: 100%;
 }
-.project-card:hover { transform: translateY(-5px); border-color: var(--accent-secondary); }
+
+.skill-card:hover, .project-card:hover, .service-card:hover { 
+    transform: translateY(-10px); 
+    border-color: var(--accent); 
+}
+
+/* Specific Project Hover Color */
+.project-card:hover { border-color: var(--accent-secondary); }
 
 .skill-tags span {
     display: inline-block;
