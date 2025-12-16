@@ -153,86 +153,135 @@ function renderWebsite(data) {
     initScrollReveal();
 }
 
-// --- 4. DYNAMIC CV GENERATOR ---
+// --- 4. DYNAMIC CV GENERATOR (UPDATED) ---
 async function generateCV() {
     if(!portfolioData) { alert("Data is loading... please wait a moment."); return; }
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    
+    // Formatting Constants
     const margin = 20;
     const pageWidth = doc.internal.pageSize.getWidth();
     const maxLineWidth = pageWidth - (margin * 2);
+    const lineHeight = 6;
     let yPos = 20;
+    
     const p = portfolioData.profile;
 
-    // Header
-    doc.setFontSize(26); doc.setFont("helvetica", "bold");
+    // --- HEADER ---
+    doc.setFontSize(24); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
     doc.text(p.name.toUpperCase(), margin, yPos);
-    yPos += 10;
-    
-    doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(80);
-    doc.text(`${p.location} | ${p.phone} | ${p.email}`, margin, yPos);
-    yPos += 6;
-    doc.text(`LinkedIn: ${p.linkedin} | GitHub: ${p.github}`, margin, yPos);
-    
-    yPos += 6;
-    doc.setDrawColor(200); doc.line(margin, yPos, pageWidth - margin, yPos); yPos += 10;
+    yPos += 8;
 
-    // Summary
-    doc.setFontSize(14); doc.setTextColor(0, 100, 200); doc.setFont("helvetica", "bold");
-    doc.text("PROFESSIONAL SUMMARY", margin, yPos); yPos += 7;
+    doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
+    doc.text(p.title.toUpperCase(), margin, yPos);
+    yPos += 8;
+    
+    doc.setFont("helvetica", "normal"); doc.setTextColor(0);
+    doc.text(`${p.location}  |  ${p.email}  |  ${p.phone}`, margin, yPos);
+    yPos += 5;
+    doc.text(`LinkedIn: ${p.linkedin}`, margin, yPos);
+    
+    // Draw Divider Line
+    yPos += 5;
+    doc.setDrawColor(200); doc.setLineWidth(0.5);
+    doc.line(margin, yPos, pageWidth - margin, yPos); 
+    yPos += 10;
+
+    // --- PROFESSIONAL SUMMARY ---
+    doc.setFontSize(12); doc.setTextColor(0, 51, 102); doc.setFont("helvetica", "bold");
+    doc.text("PROFESSIONAL SUMMARY", margin, yPos); 
+    yPos += 7;
     
     doc.setFontSize(10); doc.setTextColor(0); doc.setFont("helvetica", "normal");
     const splitSummary = doc.splitTextToSize(p.summary, maxLineWidth);
     doc.text(splitSummary, margin, yPos);
     yPos += (splitSummary.length * 5) + 5;
 
-    // Education
-    doc.setFontSize(14); doc.setTextColor(0, 100, 200); doc.setFont("helvetica", "bold");
-    doc.text("EDUCATION", margin, yPos); yPos += 7;
-    doc.setFontSize(12); doc.setTextColor(0);
-    doc.text(p.education_degree, margin, yPos);
-    doc.setFontSize(10);
-    doc.text(`${p.education_uni} (${p.education_year})`, pageWidth - margin, yPos, {align:'right'});
-    yPos += 12;
+    // --- CORE COMPETENCIES (From Services Table) ---
+    // This adds the "Services" data to the CV as "Competencies"
+    if(portfolioData.services) {
+        doc.setFontSize(12); doc.setTextColor(0, 51, 102); doc.setFont("helvetica", "bold");
+        doc.text("CORE COMPETENCIES", margin, yPos); 
+        yPos += 7;
 
-    // Skills
-    doc.setFontSize(14); doc.setTextColor(0, 100, 200); doc.setFont("helvetica", "bold");
-    doc.text("TECHNICAL SKILLS", margin, yPos); yPos += 7;
+        doc.setFontSize(10); doc.setTextColor(0); doc.setFont("helvetica", "normal");
+        
+        // Create a comma-separated list of titles for a cleaner look
+        const competencies = portfolioData.services.map(s => s.title).join("  •  ");
+        const splitComp = doc.splitTextToSize(competencies, maxLineWidth);
+        doc.text(splitComp, margin, yPos);
+        yPos += (splitComp.length * 5) + 5;
+    }
+
+    // --- TECHNICAL SKILLS ---
+    doc.setFontSize(12); doc.setTextColor(0, 51, 102); doc.setFont("helvetica", "bold");
+    doc.text("TECHNICAL SKILLS", margin, yPos); 
+    yPos += 7;
+
     doc.setFontSize(10); doc.setTextColor(0);
-
     portfolioData.skills.forEach(skill => {
         doc.setFont("helvetica", "bold");
-        doc.text(skill.category + ":", margin, yPos);
+        doc.text(skill.category + ": ", margin, yPos);
+        
+        const catWidth = doc.getTextWidth(skill.category + ": ");
         doc.setFont("helvetica", "normal");
-        doc.text(skill.skill_list, margin + 30, yPos);
+        doc.text(skill.skill_list, margin + catWidth, yPos);
         yPos += 6;
     });
     yPos += 5;
 
-    // Projects
-    doc.setFontSize(14); doc.setTextColor(0, 100, 200); doc.setFont("helvetica", "bold");
-    doc.text("PROJECTS", margin, yPos); yPos += 8;
+    // --- PROJECTS (Detailed) ---
+    if (yPos > 240) { doc.addPage(); yPos = 20; } // Page break check
+    
+    doc.setFontSize(12); doc.setTextColor(0, 51, 102); doc.setFont("helvetica", "bold");
+    doc.text("FEATURED PROJECTS", margin, yPos); 
+    yPos += 8;
 
     portfolioData.projects.forEach(proj => {
-        if(yPos > 260) { doc.addPage(); yPos = 20; }
-        
-        doc.setFontSize(12); doc.setTextColor(0); doc.setFont("helvetica", "bold");
-        doc.text(proj.title, margin, yPos); yPos += 5;
-        
-        doc.setFontSize(9); doc.setTextColor(100); doc.setFont("helvetica", "italic");
-        doc.text(proj.tech_stack, margin, yPos); yPos += 6;
+        // Check if we need a new page before printing a project
+        if(yPos > 230) { doc.addPage(); yPos = 20; }
 
+        // Project Title & Tech Stack
+        doc.setFontSize(11); doc.setTextColor(0); doc.setFont("helvetica", "bold");
+        doc.text(proj.title, margin, yPos);
+        
+        doc.setFontSize(9); doc.setTextColor(80); doc.setFont("helvetica", "italic");
+        const techWidth = doc.getTextWidth(proj.title);
+        doc.text(` (${proj.tech_stack})`, margin + techWidth + 2, yPos);
+        yPos += 6;
+
+        // Project Bullets (Splitting the full_desc by pipe symbol |)
         doc.setFontSize(10); doc.setTextColor(0); doc.setFont("helvetica", "normal");
-        const fullDesc = proj.full_desc.split('|');
-        fullDesc.forEach(line => {
-            const splitLine = doc.splitTextToSize("• " + line, maxLineWidth);
-            doc.text(splitLine, margin, yPos);
-            yPos += (splitLine.length * 5);
-        });
-        yPos += 4;
+        
+        if (proj.full_desc) {
+            const bullets = proj.full_desc.split('|');
+            bullets.forEach(bullet => {
+                const bulletText = "• " + bullet.trim();
+                const splitBullet = doc.splitTextToSize(bulletText, maxLineWidth - 5);
+                doc.text(splitBullet, margin + 5, yPos);
+                yPos += (splitBullet.length * 5);
+            });
+        }
+        yPos += 4; // Space between projects
     });
 
+    // --- EDUCATION ---
+    if (yPos > 250) { doc.addPage(); yPos = 20; }
+    
+    yPos += 2;
+    doc.setFontSize(12); doc.setTextColor(0, 51, 102); doc.setFont("helvetica", "bold");
+    doc.text("EDUCATION", margin, yPos); 
+    yPos += 7;
+    
+    doc.setFontSize(11); doc.setTextColor(0); doc.setFont("helvetica", "bold");
+    doc.text(p.education_degree, margin, yPos);
+    
+    doc.setFontSize(10); doc.setFont("helvetica", "normal");
+    doc.text(`${p.education_uni}  |  ${p.education_year}`, margin, yPos + 5);
+
+    // Save
     doc.save(`${p.name.replace(' ', '_')}_CV.pdf`);
 }
 
