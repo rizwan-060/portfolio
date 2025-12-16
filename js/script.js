@@ -104,25 +104,25 @@ function renderWebsite(data) {
         });
     }
 
-    // --- NEW: Render Services ---
-    const servicesContainer = document.getElementById('services-container');
-    if (data.services && servicesContainer) {
-        servicesContainer.innerHTML = '';
-        data.services.forEach((service, index) => {
-            const delay = (index + 1) * 100;
-            servicesContainer.innerHTML += `
-                <div class="col-md-6 col-lg-3 reveal-on-scroll" style="transition-delay: ${delay}ms">
-                    <div class="glass-panel p-4 h-100 text-center service-card">
-                        <div class="icon-box mb-3 mx-auto">
-                            <i class="fa-solid ${service.icon_class} fa-2x"></i>
-                        </div>
-                        <h5 class="fw-bold mb-3">${service.title}</h5>
-                        <p class="small text-light-gray">${service.description}</p>
-                    </div>
-                </div>
-            `;
-        });
-    }
+  // --- NEW: Render Services ---
+  const servicesContainer = document.getElementById('services-container');
+  if (data.services && servicesContainer) {
+      servicesContainer.innerHTML = '';
+      data.services.forEach((service, index) => {
+          const delay = (index + 1) * 100;
+          servicesContainer.innerHTML += `
+              <div class="col-md-6 col-lg-3 reveal-on-scroll" style="transition-delay: ${delay}ms">
+                  <div class="service-card p-4 h-100 text-center">
+                      <div class="icon-box mb-3 mx-auto">
+                          <i class="fa-solid ${service.icon_class} fa-2x"></i>
+                      </div>
+                      <h5 class="fw-bold mb-3">${service.title}</h5>
+                      <p class="small text-light-gray">${service.description}</p>
+                  </div>
+              </div>
+          `;
+      });
+  }
 
     // Projects
     const projectsContainer = document.getElementById('projects-container');

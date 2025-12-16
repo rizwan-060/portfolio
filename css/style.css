@@ -40,15 +40,18 @@ h1, h2, h3, h4, .logo-text { font-family: var(--font-heading); }
 .text-accent { color: var(--accent); }
 .text-light-gray { color: var(--text-secondary); }
 
-/* NEW: Cursive Name Style */
+/* CORRECTED: Cursive Name Style */
 #p-name {
     font-family: var(--font-signature);
     letter-spacing: 2px;
-    font-weight: 400; /* Cursive is naturally bold */
-    transform: rotate(-2deg); /* Slight tilt for handwritten feel */
-    display: inline-block;
+    font-weight: 400;
+    transform: rotate(-2deg);
+    display: block; /* CHANGED: Forces the name to its own line */
+    margin-top: 15px; /* Added space between badge and name */
+    margin-bottom: 10px; /* Added space below the name */
+    font-size: 3.5rem; /* Ensures it's nice and big */
+    line-height: 1.2;
 }
-
 .gradient-text {
     background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
     -webkit-background-clip: text;
